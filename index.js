@@ -37,7 +37,21 @@ async function run() {
         })
 
         app.get('/fresher', async(req,res)=>{
-            
+            const result = await jobPostCollection.find({experience : '1'}).toArray()
+            res.send(result);
+        })
+
+        app.get('/experience', async(req,res)=>{
+            const result = await jobPostCollection.find({experience : {$gt : '1'}}).toArray()
+            res.send(result)
+        })
+        app.get('/top-company', async(req,res)=>{
+            const result = await jobPostCollection.find({'location' : {$regex:"Dhaka"}}).sort({vacancy : -1}).limit(3).toArray();
+            res.send(result)
+        })
+        app.get('/foreign-top-company', async(req,res)=>{
+            const result = await jobPostCollection.find({'location' : {$not : {$regex:"Dhaka"}}}).sort({vacancy : -1}).limit(3).toArray();
+            res.send(result)
         })
 
 
