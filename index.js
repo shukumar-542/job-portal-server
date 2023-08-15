@@ -28,7 +28,7 @@ async function run() {
         // Send a ping to confirm a successful connection
 
         const jobPostCollection = client.db('jobPortal').collection('postJob')
-
+        const AppliedJobCollection = client.db('jobPortal').collection('appliedJobs')
 
         app.post('/jobPost', async (req, res) => {
             const body = req.body
@@ -37,11 +37,19 @@ async function run() {
         })
 
         app.get('/fresher', async(req,res)=>{
+            const result = await jobPostCollection.find({experience : '1'}).limit(6).toArray()
+            res.send(result);
+        })
+        app.get('/AllFresherJobs', async(req,res)=>{
             const result = await jobPostCollection.find({experience : '1'}).toArray()
             res.send(result);
         })
 
         app.get('/experience', async(req,res)=>{
+            const result = await jobPostCollection.find({experience : {$gt : '1'}}).limit(6).toArray()
+            res.send(result)
+        })
+        app.get('/allExperienceJobs', async(req,res)=>{
             const result = await jobPostCollection.find({experience : {$gt : '1'}}).toArray()
             res.send(result)
         })
@@ -53,9 +61,14 @@ async function run() {
             const result = await jobPostCollection.find({'location' : {$not : {$regex:"Dhaka"}}}).sort({vacancy : -1}).limit(3).toArray();
             res.send(result)
         })
+        app.post('/appliedJob', async (req, res) => {
+            const item = req.body;
+            const result = await AppliedJobCollection.insertOne(item);
+            res.send(result)
+          })
 
 
-        await client.db("admin").command({ ping: 1 });
+        // await client.db("admin").command({ ping: 1 });
         console.log("Pinged your deployment. You successfully connected to MongoDB!");
     } finally {
         // Ensures that the client will close when you finish/error
